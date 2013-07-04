@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+      }
+
+      #container {
+        background-color: #4F2828;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>
+    <script src="http://underscorejs.org/underscore.js"></script>
+    <script defer="defer">
+var stage = new Kinetic.Stage({
+  container: 'container',
+  width: window.innerWidth,
+  height: window.innerHeight
+});
+
+var layer = new Kinetic.Layer();
+
+var NUM_CIRCLES = 24;
+var circles = [];
+
+var MIN_VELOCITY = 6;
+var MAX_VELOCITY = 12;
+
+for (var i=0; i < NUM_CIRCLES; ++i) {
+  circles[i] = new Kinetic.Circle({
+    x: _.random(10, stage.getAttr('width')),
+    y: _.random(10, stage.getAttr('height')),
+    radius: _.random(6, 26),
+    fill: ['#588C7E', '#F2E394', '#F2AE72', '#D96459'][_.random(0, 3)]
+  })
+
+  circles[i].x_velocity = -MIN_VELOCITY + (MAX_VELOCITY)*Math.random();
+  circles[i].y_velocity = -MIN_VELOCITY + (MAX_VELOCITY)*Math.random();
+
+  layer.add(circles[i]);
+}
+
+anim = new Kinetic.Animation(function(frame) {
+  for (var i=0; i < NUM_CIRCLES; i++) {
+    (function(i){
+      var circle = circles[i];
+
+      var top_border = circles[i].getRadius();
+      var bottom_border = stage.getAttr('height') - circles[i].getRadius();
+
+      var left_border = circles[i].getRadius();
+      var right_border = stage.getAttr('width') - circles[i].getRadius();
+
+      if (circle.getX() === right_border ||
+          circle.getX() === left_border) {
+        circle.x_velocity = -circle.x_velocity;
+      }
+
+      if (circle.getY() === bottom_border ||
+          circle.getY() === top_border) {
+        circle.y_velocity = -circle.y_velocity;
+      }
+
+      if (circle.x_velocity >= 0) {
+        circle.setX(Math.min(right_border,
+                             circle.getX() + circle.x_velocity));
+      } else {
+        circle.setX(Math.max(left_border,
+                             circle.getX() + circle.x_velocity));
+      }
+
+      if (circle.y_velocity >= 0) {
+        circle.setY(Math.min(bottom_border,
+                             circle.getY() + circle.y_velocity));
+      } else {
+        circle.setY(Math.max(top_border,
+                             circle.getY() + circle.y_velocity));
+      }
+
+    })(i)
+  }
+}, layer);
+
+anim.start();
+
+stage.add(layer);
+    </script>
+  </body>
+</html>
